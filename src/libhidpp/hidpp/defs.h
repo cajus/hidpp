@@ -45,6 +45,7 @@ namespace HIDPP
 		WirelessDevice4 = 4,
 		WirelessDevice5 = 5,
 		WirelessDevice6 = 6,
+		SecondaryDevice = 7,
 	};
 
 	/**@}*/

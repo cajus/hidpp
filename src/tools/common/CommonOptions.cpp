@@ -18,6 +18,9 @@ Option DeviceIndexOption (HIDPP::DeviceIndex &device_index)
 				return false;
 			}
 			switch (index) {
+			case -1:
+				device_index = HIDPP::DefaultDevice;
+				break;
 			case 0:
 				device_index = HIDPP::CordedDevice;
 				break;
@@ -38,6 +41,9 @@ Option DeviceIndexOption (HIDPP::DeviceIndex &device_index)
 				break;
 			case 6:
 				device_index = HIDPP::WirelessDevice6;
+				break;
+			case 7:
+				device_index = HIDPP::SecondaryDevice;
 				break;
 			default:
 				fprintf (stderr, "Invalid device index: %s\n", optarg);
