@@ -24,7 +24,7 @@
 #include <hidpp10/IResolution.h>
 #include <hidpp20/Device.h>
 #include <hidpp20/IAdjustableDPI.h>
-#include <cstdio>
+#include <print>
 
 #include "common/common.h"
 #include "common/Option.h"
@@ -38,15 +38,15 @@ void printDPIList (InputIt begin, InputIt end)
 		if (first)
 			first = false;
 		else
-			printf (", ");
-		printf ("%u", *it);
+			std::print (", ");
+		std::print ("{}", *it);
 	}
-	printf ("\n");
+	std::println ("");
 }
 
 void printDPIRange (unsigned int min, unsigned int max, unsigned int step)
 {
-	printf ("min: %u, max: %u, step: %u\n", min, max, step);
+	std::println ("min: {}, max: {}, step: {}", min, max, step);
 }
 
 class Operations
@@ -89,7 +89,7 @@ public:
 				       range->maximumResolution (),
 				       range->resolutionStepHint ());
 		else
-			printf ("unsupported sensor\n");
+			std::println ("unsupported sensor");
 	}
 
 };
@@ -168,9 +168,9 @@ public:
 	void info ()
 	{
 		unsigned int sensor_count = _iadjustabledpi.getSensorCount ();
-		printf ("Sensor count: %u\n", sensor_count);
+		std::println ("Sensor count: {}", sensor_count);
 		for (unsigned int i = 0; i < sensor_count; ++i) {
-			printf ("%u: ", i);
+			std::print ("{}: ", i);
 			std::vector<unsigned int> list;
 			unsigned int step;
 			if (_iadjustabledpi.getSensorDPIList (i, list, step))
@@ -197,7 +197,7 @@ int main (int argc, char *argv[])
 				char *endptr;
 				sensor = strtol (optarg, &endptr, 10);
 				if (*endptr != '\0') {
-					fprintf (stderr, "Invalid sensor index: %s\n", optarg);
+					std::println (stderr, "Invalid sensor index: {}", optarg);
 					return false;
 				}
 				return true;
@@ -211,8 +211,8 @@ int main (int argc, char *argv[])
 		return EXIT_FAILURE;
 
 	if (argc-first_arg < 2) {
-		fprintf (stderr, "Too few arguments.\n");
-		fprintf (stderr, "%s", getUsage (argv[0], args, &options).c_str ());
+		std::println (stderr, "Too few arguments.");
+		std::print (stderr, "{}", getUsage (argv[0], args, &options));
 		return EXIT_FAILURE;
 	}
 
@@ -221,7 +221,7 @@ int main (int argc, char *argv[])
 		dispatcher = std::make_unique<HIDPP::SimpleDispatcher> (argv[first_arg]);
 	}
 	catch (std::exception &e) {
-		fprintf (stderr, "Failed to open device: %s.\n", e.what ());
+		std::println (stderr, "Failed to open device: {}.", e.what ());
 		return EXIT_FAILURE;
 	}
 
@@ -233,7 +233,7 @@ int main (int argc, char *argv[])
 	if (major == 1) {
 		const HIDPP10::MouseInfo *info = HIDPP10::getMouseInfo (dev.productID ());
 		if (!info) {
-			fprintf (stderr, "Unsupported mice.\n");
+			std::println (stderr, "Unsupported mice.");
 			return EXIT_FAILURE;
 		}
 
@@ -245,7 +245,7 @@ int main (int argc, char *argv[])
 			ops.reset (new Operations10Type3 (std::move (dev), info->sensor));
 			break;
 		default:
-			fprintf (stderr, "Unsupported resolution type.\n");
+			std::println (stderr, "Unsupported resolution type.");
 			return EXIT_FAILURE;
 		}
 	}
@@ -259,20 +259,20 @@ int main (int argc, char *argv[])
 		unsigned int dpi_x, dpi_y;
 		ops->get (dpi_x, dpi_y);
 		if (ops->separated_axes)
-			printf ("X: %u dpi, Y: %u dpi\n", dpi_x, dpi_y);
+			std::println ("X: {} dpi, Y: {} dpi", dpi_x, dpi_y);
 		else
-			printf ("%u dpi\n", dpi_x);
+			std::println ("{} dpi", dpi_x);
 	}
 	else if (op == "set") {
 		char *endptr;
 		unsigned int dpi_x, dpi_y;
 		if (argc - first_arg < 1) {
-			fprintf (stderr, "missing dpi_x\n");
+			std::println (stderr, "missing dpi_x");
 			return EXIT_FAILURE;
 		}
 		dpi_x = strtol (argv[first_arg], &endptr, 10);
 		if (*endptr != '\0') {
-			fprintf (stderr, "Invalid dpi_x value.\n");
+			std::println (stderr, "Invalid dpi_x value.");
 			return EXIT_FAILURE;
 		}
 		if (ops->separated_axes) {
@@ -282,7 +282,7 @@ int main (int argc, char *argv[])
 			else {
 				dpi_y = strtol (argv[first_arg+1], &endptr, 10);
 				if (*endptr != '\0') {
-					fprintf (stderr, "Invalid dpi_y value.\n");
+					std::println (stderr, "Invalid dpi_y value.");
 					return EXIT_FAILURE;
 				}
 			}
@@ -293,7 +293,7 @@ int main (int argc, char *argv[])
 		ops->info ();
 	}
 	else {
-		fprintf (stderr, "Invalid operation: %s\n", op.c_str ());
+		std::println (stderr, "Invalid operation: {}", op);
 		return EXIT_FAILURE;
 	}
 

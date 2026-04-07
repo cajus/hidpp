@@ -16,8 +16,7 @@
  *
  */
 
-#include <cstdio>
-#include <iostream>
+#include <print>
 #include <memory>
 
 #include <hidpp/SimpleDispatcher.h>
@@ -46,7 +45,7 @@ int main (int argc, char *argv[])
 
 	char *endptr;
 	if (argc-first_arg < 2) {
-		fprintf (stderr, "%s", getUsage (argv[0], args, &options).c_str ());
+		std::print (stderr, "{}", getUsage (argv[0], args, &options));
 		return EXIT_FAILURE;
 	}
 
@@ -55,7 +54,7 @@ int main (int argc, char *argv[])
 		dispatcher = std::make_unique<HIDPP::SimpleDispatcher> (argv[first_arg]);
 	}
 	catch (std::exception &e) {
-		fprintf (stderr, "Failed to open device: %s.\n", e.what ());
+		std::println (stderr, "Failed to open device: {}.", e.what ());
 		return EXIT_FAILURE;
 	}
 
@@ -66,18 +65,18 @@ int main (int argc, char *argv[])
 	if (command == "current") {
 		int current = iprofile.activeProfile ();
 		if (current == -1)
-			printf ("default\n");
+			std::println ("default");
 		else
-			printf ("%d\n", current);
+			std::println ("{}", current);
 	}
 	else if (command == "load") {
 		if (argc-first_arg != 3) {
-			fprintf (stderr, "%s", getUsage (argv[0], args, &options).c_str ());
+			std::print (stderr, "{}", getUsage (argv[0], args, &options));
 			return EXIT_FAILURE;
 		}
 		int index = strtol (argv[first_arg+2], &endptr, 10);
 		if (*endptr != '\0') {
-			fprintf (stderr, "Invalid profile index \"%s\"\n", argv[first_arg+2]);
+			std::println (stderr, "Invalid profile index \"{}\"", argv[first_arg+2]);
 			return EXIT_FAILURE;
 		}
 		iprofile.loadProfileFromIndex (index);
@@ -87,19 +86,19 @@ int main (int argc, char *argv[])
 	}
 	else if (command == "load-address") {
 		if (argc-first_arg < 3 || argc-first_arg > 4) {
-			fprintf (stderr, "%s", getUsage (argv[0], args, &options).c_str ());
+			std::print (stderr, "{}", getUsage (argv[0], args, &options));
 			return EXIT_FAILURE;
 		}
 		int page = strtol (argv[first_arg+2], &endptr, 0);
 		if (*endptr != '\0' || page < 0 || page > 255) {
-			fprintf (stderr, "Invalid page number \"%s\"\n", argv[first_arg+2]);
+			std::println (stderr, "Invalid page number \"{}\"", argv[first_arg+2]);
 			return EXIT_FAILURE;
 		}
 		int offset;
 		if (argc-first_arg == 4) {
 			offset = strtol (argv[first_arg+3], &endptr, 0);
 			if (*endptr != '\0' || page < 0 || page > 255) {
-				fprintf (stderr, "Invalid offset \"%s\"\n", argv[first_arg+2]);
+				std::println (stderr, "Invalid offset \"{}\"", argv[first_arg+2]);
 				return EXIT_FAILURE;
 			}
 		}
@@ -115,7 +114,7 @@ int main (int argc, char *argv[])
 		iprofile.reloadActiveProfile ();
 	}
 	else {
-		fprintf (stderr, "Invalid command \"%s\".\n", argv[first_arg+1]);
+		std::println (stderr, "Invalid command \"{}\".", argv[first_arg+1]);
 		return EXIT_FAILURE;
 	}
 

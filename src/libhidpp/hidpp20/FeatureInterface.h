@@ -22,6 +22,7 @@
 #include <hidpp20/Device.h>
 
 #include <cstdint>
+#include <span>
 #include <vector>
 
 namespace HIDPP20
@@ -32,14 +33,14 @@ class FeatureInterface
 public:
 	FeatureInterface (Device *dev, uint16_t id, const char *name);
 
-	Device *device () const;
+	[[nodiscard]] Device *device () const;
 
-	uint8_t index () const;
+	[[nodiscard]] uint8_t index () const;
 
-	template<typename... Params>
-	std::vector<uint8_t> call (unsigned int function, Params... params)
+	std::vector<uint8_t> call (unsigned int function,
+	                           std::span<const uint8_t> params = {})
 	{
-		return _dev->callFunction (_index, function, params...);
+		return _dev->callFunction (_index, function, params);
 	}
 
 private:
@@ -50,4 +51,3 @@ private:
 }
 
 #endif
-

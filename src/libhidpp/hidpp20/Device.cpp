@@ -21,6 +21,9 @@
 #include <hidpp/Dispatcher.h>
 #include <misc/Log.h>
 
+#include <algorithm>
+#include <stdexcept>
+
 using namespace HIDPP20;
 
 unsigned int Device::softwareID = 1;
@@ -29,7 +32,7 @@ Device::Device (HIDPP::Dispatcher *dispatcher, HIDPP::DeviceIndex device_index):
 	HIDPP::Device (dispatcher, device_index)
 {
 	auto version = protocolVersion ();
-	if (std::get<0> (version) < 2)
+	if (auto [major, minor] = version; major < 2)
 		throw HIDPP::Device::InvalidProtocolVersion (version);
 }
 
@@ -37,25 +40,23 @@ Device::Device (HIDPP::Device &&device):
 	HIDPP::Device (std::move (device))
 {
 	auto version = protocolVersion ();
-	if (std::get<0> (version) < 2)
+	if (auto [major, minor] = version; major < 2)
 		throw HIDPP::Device::InvalidProtocolVersion (version);
 }
 
 std::vector<uint8_t> Device::callFunction (uint8_t feature_index,
-					   unsigned int function,
-					   std::vector<uint8_t>::const_iterator param_begin,
-					   std::vector<uint8_t>::const_iterator param_end)
+                                            unsigned int function,
+                                            std::span<const uint8_t> params)
 {
 	auto debug = Log::debug ("call");
 	debug.printf ("Calling feature 0x%02hhx/function %u\n", feature_index, function);
-	debug.printBytes ("Parameters:", param_begin, param_end);
+	debug.printBytes ("Parameters:", params.begin (), params.end ());
 
-	std::size_t len = std::distance (param_begin, param_end);
-	auto type = dispatcher ()->reportInfo ().findReport (len);
+	auto type = dispatcher ()->reportInfo ().findReport (params.size ());
 	if (!type)
 		throw std::logic_error ("Parameters too long");
 	HIDPP::Report request (*type, deviceIndex (), feature_index, function, softwareID);
-	std::copy (param_begin, param_end, request.parameterBegin ());
+	std::ranges::copy (params, request.parameterBegin ());
 
 	auto response = dispatcher ()->sendCommand (std::move (request))->get ();
 

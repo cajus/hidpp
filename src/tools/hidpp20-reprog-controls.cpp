@@ -20,7 +20,7 @@
 #include <hidpp20/Device.h>
 #include <hidpp20/Error.h>
 #include <hidpp20/IReprogControlsV4.h>
-#include <cstdio>
+#include <print>
 #include <memory>
 
 #include "common/common.h"
@@ -41,12 +41,12 @@ static void printFlags (T flags, std::vector<std::tuple<T, const char*>> list)
 			if (first)
 				first = false;
 			else
-				printf (", ");
-			printf ("%s", str);
+				std::print(", ");
+			std::print("{}", str);
 		}
 	}
 	if (first)
-		printf ("-");
+		std::print("-");
 }
 
 enum Flag {
@@ -93,8 +93,8 @@ int main (int argc, char *argv[])
 		return EXIT_FAILURE;
 
 	if (argc-first_arg < 2) {
-		fprintf (stderr, "Too few arguments.\n");
-		fprintf (stderr, "%s", getUsage (argv[0], args, &options).c_str ());
+		std::println(stderr, "Too few arguments.");
+		std::print(stderr, "{}", getUsage (argv[0], args, &options).c_str ());
 		return EXIT_FAILURE;
 	}
 
@@ -107,7 +107,7 @@ int main (int argc, char *argv[])
 		dispatcher = std::make_unique<HIDPP::SimpleDispatcher> (path);
 	}
 	catch (std::exception &e) {
-		fprintf (stderr, "Failed to open device: %s.\n", e.what ());
+		std::println(stderr, "Failed to open device: {}.", e.what ());
 		return EXIT_FAILURE;
 	}
 	Device dev (dispatcher.get (), device_index);
@@ -115,25 +115,25 @@ int main (int argc, char *argv[])
 		IReprogControlsV4 irc (&dev);
 		if (op == "info") {
 			unsigned int count = irc.getControlCount ();
-			printf ("Control\tTask\tInfo\tFn\tCapabilities\tGroup\tRemap to groups\n");
+			std::println("Control\tTask\tInfo\tFn\tCapabilities\tGroup\tRemap to groups");
 			for (unsigned int i = 0; i < count; ++i) {
 				auto info = irc.getControlInfo (i);
-				printf ("0x%04hx\t0x%04hx", info.control_id, info.task_id);
+				std::print("0x{:04x}\t0x{:04x}", info.control_id, info.task_id);
 				if (info.flags & IReprogControlsV4::MouseButton)
-					printf ("\tmouse");
+					std::print("\tmouse");
 				else if (info.flags & IReprogControlsV4::FKey)
-					printf ("\tF%d", info.pos);
+					std::print("\tF{}", info.pos);
 				else if (info.flags & IReprogControlsV4::HotKey)
-					printf ("\thotkey");
+					std::print("\thotkey");
 				else
-					printf ("\t-");
+					std::print("\t-");
 
 				if (info.flags & IReprogControlsV4::FnToggle)
-					printf ("\ttoggle");
+					std::print("\ttoggle");
 				else
-					printf ("\t-");
+					std::print("\t-");
 
-				printf ("\t");
+				std::print("\t");
 				printFlags (info.flags | ((uint16_t) info.additional_flags << 8), {
 					std::make_tuple (IReprogControlsV4::ReprogHint, "reprog"),
 					std::make_tuple (IReprogControlsV4::TemporaryDivertable, "divert"),
@@ -141,12 +141,12 @@ int main (int argc, char *argv[])
 					std::make_tuple (IReprogControlsV4::Virtual, "virtual"),
 					std::make_tuple (IReprogControlsV4::RawXY<<8, "rawxy"),
 				});
-				printf ("\t");
+				std::print("\t");
 				if (info.group != 0)
-					printf ("%d", info.group);
+					std::print("{}", info.group);
 				else
-					printf ("-");
-				printf ("\t");
+					std::print("-");
+				std::print("\t");
 				if (info.group_mask != 0) {
 					bool first = true;
 					for (unsigned int i = 0; i < 8; ++i)
@@ -154,48 +154,48 @@ int main (int argc, char *argv[])
 							if (first)
 								first = false;
 							else
-								printf ("+");
-							printf ("%d", i+1);
+								std::print("+");
+							std::print("{}", i+1);
 						}
 				}
 				else
-					printf ("-");
-				printf ("\n");
+					std::print("-");
+				std::println("");
 			}
 		}
 		else if (op == "get") {
 			int cid;
 			char *endptr;
 			if (argc-first_arg < 1) {
-				fprintf (stderr, "Missing control id.\n");
+				std::println(stderr, "Missing control id.");
 				return EXIT_FAILURE;
 			}
 			cid = strtol (argv[first_arg], &endptr, 0);
 			if (*endptr != '\0' || cid < 0 || cid > 65535) {
-				fprintf (stderr, "Invalid control ID value.\n");
+				std::println(stderr, "Invalid control ID value.");
 				return EXIT_FAILURE;
 			}
 			uint8_t flags;
 			uint16_t remap = irc.getControlReporting (cid, flags);
-			printf ("0x%04hx (flags: ", remap);
+			std::print("0x{:04x} (flags: ", remap);
 			printFlags (flags, {
 				std::make_tuple (IReprogControlsV4::TemporaryDiverted, "divert"),
 				std::make_tuple (IReprogControlsV4::PersistentDiverted, "persist"),
 				std::make_tuple (IReprogControlsV4::RawXYDiverted, "rawxy"),
 			});
-			printf (")\n");
+			std::println(")");
 
 		}
 		else if (op == "set") {
 			int cid, remap;
 			char *endptr;
 			if (argc-first_arg < 1) {
-				fprintf (stderr, "Missing control id.\n");
+				std::println(stderr, "Missing control id.");
 				return EXIT_FAILURE;
 			}
 			cid = strtol (argv[first_arg], &endptr, 0);
 			if (*endptr != '\0' || cid < 0 || cid > 65535) {
-				fprintf (stderr, "Invalid control ID value.\n");
+				std::println(stderr, "Invalid control ID value.");
 				return EXIT_FAILURE;
 			}
 			if (argc-first_arg < 2) {
@@ -204,7 +204,7 @@ int main (int argc, char *argv[])
 			else {
 				remap = strtol (argv[first_arg+1], &endptr, 0);
 				if (*endptr != '\0' || remap < 0 || remap > 65535) {
-					fprintf (stderr, "Invalid remap control ID value.\n");
+					std::println(stderr, "Invalid remap control ID value.");
 					return EXIT_FAILURE;
 				}
 			}
@@ -224,12 +224,12 @@ int main (int argc, char *argv[])
 			irc.setControlReporting (cid, flags, remap);
 		}
 		else {
-			fprintf (stderr, "Invalid operation: %s\n", op.c_str ());
+			std::println(stderr, "Invalid operation: {}", op.c_str ());
 			return EXIT_FAILURE;
 		}
 	}
 	catch (Error &e) {
-		fprintf (stderr, "Error code %d: %s\n", e.errorCode (), e.what ());
+		std::println(stderr, "Error code {}: {}", e.errorCode (), e.what ());
 		return e.errorCode ();
 	}
 

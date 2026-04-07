@@ -18,7 +18,7 @@
 
 #include "UsageStrings.h"
 
-#include <sstream>
+#include <format>
 #include <map>
 #include <vector>
 #include <stdexcept>
@@ -161,11 +161,8 @@ static const std::vector<std::string> key_strings = []() {
 
 std::string HID::keyString (unsigned int usage_code)
 {
-	if (usage_code > KeyMax || key_strings[usage_code].empty ()) {
-		std::stringstream ss;
-		ss << "0x" << std::hex << std::setw (2) << std::setfill ('0') << usage_code;
-		return ss.str ();
-	}
+	if (usage_code > KeyMax || key_strings[usage_code].empty ())
+		return std::format ("0x{:02x}", usage_code);
 	return key_strings[usage_code];
 }
 
@@ -478,11 +475,8 @@ static const std::vector<std::string> cc_strings = []() {
 
 std::string HID::consumerControlString (unsigned int usage_code)
 {
-	if (usage_code > CCMax || cc_strings[usage_code].empty ()) {
-		std::stringstream ss;
-		ss << "0x" << std::hex << std::setw (4) << std::setfill ('0') << usage_code;
-		return ss.str ();
-	}
+	if (usage_code > CCMax || cc_strings[usage_code].empty ())
+		return std::format ("0x{:04x}", usage_code);
 	return cc_strings[usage_code];
 }
 

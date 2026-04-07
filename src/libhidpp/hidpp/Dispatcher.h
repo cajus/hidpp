@@ -24,6 +24,7 @@
 #include <map>
 #include <functional>
 #include <optional>
+#include <string>
 
 namespace HIDPP
 {
@@ -46,6 +47,7 @@ public:
 
 	class TimeoutError: public std::exception
 	{
+	public:
 		virtual const char *what () const noexcept;
 	};
 

@@ -23,8 +23,8 @@
 #include <hidpp20/IMouseButtonSpy.h>
 #include <hidpp20/IOnboardProfiles.h>
 #include <hidpp20/UnsupportedFeature.h>
-#include <cstdio>
 #include <memory>
+#include <print>
 
 #include "common/common.h"
 #include "common/Option.h"
@@ -57,7 +57,7 @@ public:
 		_button_count (_imbs.getMouseButtonCount ()),
 		_button_state (0)
 	{
-		printf ("The mouse has %d buttons.\n", _button_count);
+		std::println ("The mouse has {} buttons.", _button_count);
 		_imbs.startMouseButtonSpy ();
 	}
 
@@ -79,7 +79,7 @@ public:
 			new_state = IMouseButtonSpy::mouseButtonEvent (event);
 			for (unsigned int i = 0; i < _button_count; ++i) {
 				if ((_button_state ^ new_state) & (1<<i))
-					printf ("Button %d: %s\n", i, (new_state & (1<<i) ? "pressed" : "released"));
+					std::println ("Button {}: {}", i, (new_state & (1<<i) ? "pressed" : "released"));
 			}
 			_button_state = new_state;
 			break;
@@ -113,12 +113,12 @@ public:
 	{
 		switch (event.function ()) {
 		case IOnboardProfiles::CurrentProfileChanged:
-			printf ("Current profile changed: %u\n",
+			std::println ("Current profile changed: {}",
 				std::get<1> (IOnboardProfiles::currentProfileChanged (event)));
 			break;
 		case IOnboardProfiles::CurrentDPIIndexChanged:
-			printf ("Current dpi index changed: %u\n",
-			IOnboardProfiles::currentDPIIndexChanged (event));
+			std::println ("Current dpi index changed: {}",
+				IOnboardProfiles::currentDPIIndexChanged (event));
 			break;
 		}
 	}
@@ -265,8 +265,8 @@ int main (int argc, char *argv[])
 		return EXIT_FAILURE;
 
 	if (argc-first_arg < 1) {
-		fprintf (stderr, "Too few arguments.\n");
-		fprintf (stderr, "%s", getUsage (argv[0], args, &options).c_str ());
+		std::println (stderr, "Too few arguments.");
+		std::print (stderr, "{}", getUsage (argv[0], args, &options));
 		return EXIT_FAILURE;
 	}
 
@@ -288,7 +288,7 @@ int main (int argc, char *argv[])
 		}
 	}
 	catch (std::exception &e) {
-		fprintf (stderr, "Initialization failed: %s\n", e.what ());
+		std::println (stderr, "Initialization failed: {}", e.what ());
 		delete listener;
 		return EXIT_FAILURE;
 	}
@@ -302,13 +302,13 @@ int main (int argc, char *argv[])
 		listener->addEventHandler (std::make_unique<ButtonHandler> (dev.get ()));
 	}
 	catch (HIDPP20::UnsupportedFeature &e) {
-		printf ("%s\n", e.what ());
+		std::println ("{}", e.what ());
 	}
 	try {
 		listener->addEventHandler (std::make_unique<ProfileHandler> (dev.get ()));
 	}
 	catch (HIDPP20::UnsupportedFeature &e) {
-		printf ("%s\n", e.what ());
+		std::println ("{}", e.what ());
 	}
 	listener->start();
 	listener->removeEventHandlers ();

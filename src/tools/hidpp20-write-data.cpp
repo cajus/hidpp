@@ -18,6 +18,7 @@
 
 #include <cstdio>
 #include <memory>
+#include <print>
 
 #include <hidpp/SimpleDispatcher.h>
 #include <hidpp20/Device.h>
@@ -47,7 +48,7 @@ int main (int argc, char *argv[])
 		return EXIT_FAILURE;
 
 	if (argc-first_arg != 3) {
-		fprintf (stderr, "%s", getUsage (argv[0], args, &options).c_str ());
+		std::print (stderr, "{}", getUsage (argv[0], args, &options));
 		return EXIT_FAILURE;
 	}
 
@@ -55,12 +56,12 @@ int main (int argc, char *argv[])
 	char *end;
 	int page = strtol (argv[first_arg+1], &end, 0);
 	if (*end != '\0' || page < 0) {
-		fprintf (stderr, "Invalid page index.\n");
+		std::println (stderr, "Invalid page index.");
 		return EXIT_FAILURE;
 	}
 	int offset = strtol (argv[first_arg+2], &end, 0);
 	if (*end != '\0' || offset < 0) {
-		fprintf (stderr, "Invalid offset.\n");
+		std::println (stderr, "Invalid offset.");
 		return EXIT_FAILURE;
 	}
 
@@ -69,7 +70,7 @@ int main (int argc, char *argv[])
 		dispatcher = std::make_unique<HIDPP::SimpleDispatcher> (path);
 	}
 	catch (std::exception &e) {
-		fprintf (stderr, "Failed to open device: %s.\n", e.what ());
+		std::println (stderr, "Failed to open device: {}.", e.what ());
 		return EXIT_FAILURE;
 	}
 	HIDPP20::Device dev (dispatcher.get (), device_index);
@@ -79,7 +80,7 @@ int main (int argc, char *argv[])
 	while (!feof (stdin)) {
 		int ret = fread (buffer, sizeof(uint8_t), 256, stdin);
 		if (ferror (stdin)) {
-			fprintf (stderr, "Failed to read data.\n");
+			std::println (stderr, "Failed to read data.");
 			return EXIT_FAILURE;
 		}
 		data.insert (data.end (), buffer, buffer+ret);
@@ -96,7 +97,7 @@ int main (int argc, char *argv[])
 		iop.memoryWriteEnd ();
 	}
 	catch (HIDPP20::Error &e) {
-		fprintf (stderr, "Error while writing data: %s (%d).\n", e.what (), e.errorCode ());
+		std::println (stderr, "Error while writing data: {} ({}).", e.what (), e.errorCode ());
 		return e.errorCode ();
 	}
 

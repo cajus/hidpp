@@ -21,6 +21,7 @@
 
 #include <hidpp/AbstractProfileFormat.h>
 #include <hidpp10/Sensor.h>
+#include <string>
 
 namespace HIDPP10
 {

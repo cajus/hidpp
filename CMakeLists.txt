@@ -5,7 +5,7 @@ option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 option(BUILD_TOOLS "Build HID++ command line tools" ON)
 option(INSTALL_UDEV_RULES "Install udev rules for user access to HID++ devices (requires building tools)" OFF)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")

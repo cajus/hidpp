@@ -19,8 +19,8 @@
 #include <hidpp/SimpleDispatcher.h>
 #include <hidpp10/Device.h>
 #include <hidpp10/Error.h>
-#include <cstdio>
 #include <memory>
+#include <print>
 
 #include "common/common.h"
 #include "common/Option.h"
@@ -43,8 +43,8 @@ int main (int argc, char *argv[])
 		return EXIT_FAILURE;
 
 	if (argc-first_arg < 4) {
-		fprintf (stderr, "Too few arguments.\n");
-		fprintf (stderr, "%s", getUsage (argv[0], args, &options).c_str ());
+		std::println (stderr, "Too few arguments.");
+		std::print (stderr, "{}", getUsage (argv[0], args, &options));
 		return EXIT_FAILURE;
 	}
 
@@ -53,7 +53,7 @@ int main (int argc, char *argv[])
 		dispatcher = std::make_unique<HIDPP::SimpleDispatcher> (argv[first_arg]);
 	}
 	catch (std::exception &e) {
-		fprintf (stderr, "Failed to open device: %s.\n", e.what ());
+		std::println (stderr, "Failed to open device: {}.", e.what ());
 		return EXIT_FAILURE;
 	}
 
@@ -61,7 +61,7 @@ int main (int argc, char *argv[])
 
 	int address = strtol (argv[first_arg+1], &endptr, 0);
 	if (*endptr != '\0' || address < 0 || address > 255) {
-		fprintf (stderr, "Invalid register address.\n");
+		std::println (stderr, "Invalid register address.");
 		return EXIT_FAILURE;
 	}
 	std::string type = argv[first_arg+2];
@@ -72,7 +72,7 @@ int main (int argc, char *argv[])
 	else if (size_string == "long")
 		register_size = HIDPP::LongParamLength;
 	else {
-		fprintf (stderr, "Invalid length option (must be short or long).\n");
+		std::println (stderr, "Invalid length option (must be short or long).");
 		return EXIT_FAILURE;
 	}
 
@@ -81,7 +81,7 @@ int main (int argc, char *argv[])
 	for (int i = 0; first_arg+4+i < argc; ++i) {
 		int value = strtol (argv[first_arg+4+i], &endptr, 16);
 		if (*endptr != '\0' || value < 0 || value > 255) {
-			fprintf (stderr, "Invalid parameter %d value.\n", i);
+			std::println (stderr, "Invalid parameter {} value.", i);
 			return EXIT_FAILURE;
 		}
 		params.push_back (static_cast<uint8_t> (value));
@@ -90,7 +90,7 @@ int main (int argc, char *argv[])
 	try {
 		if (type == "read") {
 			if (params.size () > HIDPP::ShortParamLength) {
-				fprintf (stderr, "Too many parameters.\n");
+				std::println (stderr, "Too many parameters.");
 				return EXIT_FAILURE;
 			}
 			params.resize (HIDPP::ShortParamLength, 0);
@@ -100,7 +100,7 @@ int main (int argc, char *argv[])
 		}
 		else if (type == "write") {
 			if (params.size () > register_size) {
-				fprintf (stderr, "Too many parameters.\n");
+				std::println (stderr, "Too many parameters.");
 				return EXIT_FAILURE;
 			}
 			params.resize (register_size, 0);
@@ -109,7 +109,7 @@ int main (int argc, char *argv[])
 		}
 	}
 	catch (HIDPP10::Error &e) {
-		fprintf (stderr, "%s\n", e.what ());
+		std::println (stderr, "{}", e.what ());
 		return e.errorCode ();
 	}
 
@@ -117,11 +117,11 @@ int main (int argc, char *argv[])
 	for (uint8_t value: results) {
 		if (first)
 			first = false;
-		else 
-			printf (" ");
-		printf ("%02hhx", value);
+		else
+			std::print (" ");
+		std::print ("{:02x}", value);
 	}
-	printf ("\n");
+	std::println ("");
 
 	return EXIT_SUCCESS;
 }

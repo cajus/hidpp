@@ -18,6 +18,7 @@
 
 #include <cstdio>
 #include <memory>
+#include <print>
 
 #include <hidpp/SimpleDispatcher.h>
 #include <hidpp20/Device.h>
@@ -53,7 +54,7 @@ int main (int argc, char *argv[])
 		return EXIT_FAILURE;
 
 	if (argc-first_arg != 2) {
-		fprintf (stderr, "%s", getUsage (argv[0], args, &options).c_str ());
+		std::print (stderr, "{}", getUsage (argv[0], args, &options));
 		return EXIT_FAILURE;
 	}
 
@@ -61,7 +62,7 @@ int main (int argc, char *argv[])
 	char *endptr;
 	unsigned int page = strtol (argv[first_arg+1], &endptr, 0);
 	if (*endptr != '\0') {
-		fprintf (stderr, "Invalid page number.\n");
+		std::println (stderr, "Invalid page number.");
 		return EXIT_FAILURE;
 	}
 
@@ -70,7 +71,7 @@ int main (int argc, char *argv[])
 		dispatcher = std::make_unique<HIDPP::SimpleDispatcher> (path);
 	}
 	catch (std::exception &e) {
-		fprintf (stderr, "Failed to open device: %s.\n", e.what ());
+		std::println (stderr, "Failed to open device: {}.", e.what ());
 		return EXIT_FAILURE;
 	}
 	HIDPP20::Device dev (dispatcher.get (), device_index);
@@ -85,7 +86,7 @@ int main (int argc, char *argv[])
 		}
 	}
 	catch (HIDPP20::Error &e) {
-		fprintf (stderr, "HID++2 error %d: %s\n", e.errorCode (), e.what ());
+		std::println (stderr, "HID++2 error {}: {}", e.errorCode (), e.what ());
 		return e.errorCode ();
 	}
 

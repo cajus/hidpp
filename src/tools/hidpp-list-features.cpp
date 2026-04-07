@@ -16,7 +16,7 @@
  *
  */
 
-#include <cstdio>
+#include <print>
 #include <map>
 
 #include <hidpp/SimpleDispatcher.h>
@@ -133,15 +133,15 @@ void testRegister (HIDPP10::Device *dev, std::size_t register_size, uint8_t addr
 	try {
 		dev->getRegister (address, nullptr, values);
 		readable = true;
-		printf ("Register 0x%02hhx read  %2lu:", address, register_size);
+		std::print("Register 0x{:02x} read  {:2}:", address, register_size);
 		for (uint8_t value: values)
-			printf (" %02hhx", value);
-		printf ("\n");
+			std::print(" {:02x}", static_cast<unsigned>(value));
+		std::println("");
 	}
 	catch (HIDPP10::Error &e) {
 		if (e.errorCode () != HIDPP10::Error::InvalidSubID &&
 		    e.errorCode () != HIDPP10::Error::InvalidAddress) {
-			printf ("Register 0x%02hhx read  %2lu: %s (0x%02hhx)\n",
+			std::println("Register 0x{:02x} read  {:2}: {} (0x{:02x})",
 				address, register_size, e.what (), e.errorCode ());
 		}
 	}
@@ -155,15 +155,15 @@ void testRegister (HIDPP10::Device *dev, std::size_t register_size, uint8_t addr
 				std::vector<uint8_t> params (register_size);
 				dev->setRegister (address, params, &results);
 			}
-			printf ("Register 0x%02hhx write %2lu:", address, register_size);
+			std::print("Register 0x{:02x} write {:2}:", address, register_size);
 			for (uint8_t value: results)
-				printf (" %02hhx", value);
-			printf ("\n");
+				std::print(" {:02x}", static_cast<unsigned>(value));
+			std::println("");
 		}
 		catch (HIDPP10::Error &e) {
 			if (e.errorCode () != HIDPP10::Error::InvalidSubID &&
 			    e.errorCode () != HIDPP10::Error::InvalidAddress) {
-				printf ("Register 0x%02hhx write %2lu: %s (0x%02hhx)\n",
+				std::println("Register 0x{:02x} write {:2}: {} (0x{:02x})",
 					address, register_size, e.what (), e.errorCode ());
 			}
 		}
@@ -201,7 +201,7 @@ int main (int argc, char *argv[])
 		return EXIT_FAILURE;
 
 	if (argc-first_arg != 1) {
-		fprintf (stderr, "%s", getUsage (argv[0], args, &options).c_str ());
+		std::print(stderr, "{}", getUsage (argv[0], args, &options));
 		return EXIT_FAILURE;
 	}
 
@@ -212,11 +212,11 @@ int main (int argc, char *argv[])
 		dispatcher = std::make_unique<HIDPP::SimpleDispatcher> (path);
 	}
 	catch (HIDPP::Dispatcher::NoHIDPPReportException &e) {
-		printf ("%s is not a HID++ device\n", path);
+		std::println("{} is not a HID++ device", path);
 		return EXIT_FAILURE;
 	}
 	catch (std::system_error &e) {
-		fprintf (stderr, "Failed to open %s: %s\n", path, e.what ());
+		std::println(stderr, "Failed to open {}: {}", path, e.what ());
 		return EXIT_FAILURE;
 	}
 	HIDPP::Device gdev (dispatcher.get (), device_index);
@@ -227,8 +227,8 @@ int main (int argc, char *argv[])
 	unsigned int major, minor;
 	std::tie (major, minor) = gdev.protocolVersion ();
 
-	printf ("%s (%04hx:%04hx) is a HID++ %d.%d device\n",
-		gdev.name ().c_str (),
+	std::println("{} ({:04x}:{:04x}) is a HID++ {}.{} device",
+		gdev.name (),
 		dispatcher->vendorID (), gdev.productID (),
 		major, minor);
 
@@ -249,34 +249,34 @@ int main (int argc, char *argv[])
 				iif.setFlags (0x00FFFFFF);
 				unsigned int flags = iif.flags ();
 				iif.setFlags (old_flags);
-				printf ("Individual features: %06x\n", flags);
+				std::println("Individual features: {:06x}", flags);
 				if (flags & HIDPP10::IIndividualFeatures::SpecialButtonFunction) {
-					printf (" - Special Button Function\n");
+					std::println(" - Special Button Function");
 				}
 				if (flags & HIDPP10::IIndividualFeatures::EnhancedKeyUsage) {
-					printf (" - Enhanced Key Usage\n");
+					std::println(" - Enhanced Key Usage");
 				}
 				if (flags & HIDPP10::IIndividualFeatures::FastForwardRewind) {
-					printf (" - Fast Forward/Rewind\n");
+					std::println(" - Fast Forward/Rewind");
 				}
 				if (flags & HIDPP10::IIndividualFeatures::ScrollingAcceleration) {
-					printf (" - Scrolling Acceleration\n");
+					std::println(" - Scrolling Acceleration");
 				}
 				if (flags & HIDPP10::IIndividualFeatures::ButtonsControlResolution) {
-					printf (" - Buttons Control Resolution\n");
+					std::println(" - Buttons Control Resolution");
 				}
 				if (flags & HIDPP10::IIndividualFeatures::InhibitLockKeySound) {
-					printf (" - Inhibit Lock KeyS ound\n");
+					std::println(" - Inhibit Lock KeyS ound");
 				}
 				if (flags & HIDPP10::IIndividualFeatures::MXAir3DEngine) {
-					printf (" - 3D Engine\n");
+					std::println(" - 3D Engine");
 				}
 				if (flags & HIDPP10::IIndividualFeatures::LEDControl) {
-					printf (" - LED Control\n");
+					std::println(" - LED Control");
 				}
 			}
 			catch (HIDPP10::Error &e) {
-				printf ("Individual features: %s\n", e.what ());
+				std::println("Individual features: {}", e.what ());
 			}
 		}
 	}
@@ -295,7 +295,7 @@ int main (int argc, char *argv[])
 
 			feature_id = ifeatureset.getFeatureID (feature_index, &obsolete, &hidden, &internal);
 			auto str = HIDPP20Features.find (feature_id);
-			printf ("Feature 0x%02hhx: [0x%04hx] %s",
+			std::print("Feature 0x{:02x}: [0x{:04x}] {}",
 				feature_index, feature_id,
 				(str == HIDPP20Features.end () ? "?" : str->second));
 			std::vector<const char *> flag_strings;
@@ -306,22 +306,22 @@ int main (int argc, char *argv[])
 			if (internal)
 				flag_strings.push_back ("internal");
 			if (!flag_strings.empty ()) {
-				printf (" (");
+				std::print(" (");
 				bool first = true;
 				for (auto str: flag_strings) {
 					if (first)
 						first = false;
 					else
-						printf (", ");
-					printf ("%s", str);
+						std::print(", ");
+					std::print("{}", str);
 				}
-				printf (")");
+				std::print(")");
 			}
-			printf ("\n");
+			std::println("");
 		}
 	}
 	else {
-		fprintf (stderr, "Unsupported HID++ protocol version.\n");
+		std::println(stderr, "Unsupported HID++ protocol version.");
 		return EXIT_FAILURE;
 	}
 	return EXIT_SUCCESS;

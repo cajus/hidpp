@@ -20,9 +20,8 @@
 #include <hidpp20/Device.h>
 #include <hidpp20/Error.h>
 #include <hidpp20/ILEDControl.h>
-#include <cstdio>
-#include <iostream>
 #include <memory>
+#include <print>
 
 #include "common/common.h"
 #include "common/Option.h"
@@ -100,28 +99,26 @@ static const Enum<ILEDControl::Config> Configs = {
 
 static void print_state(const ILEDControl::State &state)
 {
-	std::cout << Modes.name (state.mode);
+	std::print ("{}", Modes.name (state.mode));
 	switch (state.mode) {
 	case ILEDControl::On:
-		std::cout << "\tindex: " << state.on.index;
+		std::print ("\tindex: {}", state.on.index);
 		break;
 	case ILEDControl::Blink:
-		std::cout << "\tindex: " << state.blink.index;
-		std::cout << ", on duration: " << state.blink.on_duration;
-		std::cout << ", off duration: " << state.blink.off_duration;
+		std::print ("\tindex: {}, on duration: {}, off duration: {}",
+		            state.blink.index, state.blink.on_duration, state.blink.off_duration);
 		break;
 	case ILEDControl::Travel:
-		std::cout << "\tdelay: " << state.travel.delay;
+		std::print ("\tdelay: {}", state.travel.delay);
 		break;
 	case ILEDControl::Breathing:
-		std::cout << "\tmax brightness: " << state.breathing.max_brightness;
-		std::cout << ", period: " << state.breathing.period;
-		std::cout << ", timeout: " << state.breathing.timeout;
+		std::print ("\tmax brightness: {}, period: {}, timeout: {}",
+		            state.breathing.max_brightness, state.breathing.period, state.breathing.timeout);
 		break;
 	default:
 		break;
 	}
-	std::cout << std::endl;
+	std::println ("");
 }
 
 int main (int argc, char *argv[])
@@ -141,8 +138,8 @@ int main (int argc, char *argv[])
 		return EXIT_FAILURE;
 
 	if (argc-first_arg < 2) {
-		std::cerr << "Too few arguments." << std::endl;
-		std::cerr << getUsage (argv[0], args, &options) << std::endl;
+		std::println (stderr, "Too few arguments.");
+		std::print (stderr, "{}", getUsage (argv[0], args, &options));
 		return EXIT_FAILURE;
 	}
 
@@ -155,7 +152,7 @@ int main (int argc, char *argv[])
 		dispatcher = std::make_unique<HIDPP::SimpleDispatcher> (path);
 	}
 	catch (std::exception &e) {
-		std::cerr << "Failed to open device: " << e.what () << "." << std::endl;
+		std::println (stderr, "Failed to open device: {}.", e.what ());
 		return EXIT_FAILURE;
 	}
 	Device dev (dispatcher.get (), device_index);
@@ -164,10 +161,10 @@ int main (int argc, char *argv[])
 		ILEDControl iled (&dev);
 		if (op == "info") {
 			unsigned int count = iled.getCount ();
-			std::cout << "LED\tType\tModes\tConfigs" << std::endl;
+			std::println ("LED\tType\tModes\tConfigs");
 			for (unsigned int i = 0; i < count; ++i) {
 				auto info = iled.getInfo (i);
-				std::cout << i << "\t" << LEDType (info.type) << "\t";
+				std::print ("{}\t{}\t", i, LEDType (info.type));
 				if (info.modes != 0) {
 					bool first = true;
 					for (unsigned int j = 0; j < 16; ++j) {
@@ -177,14 +174,14 @@ int main (int argc, char *argv[])
 						if (first)
 							first = false;
 						else
-							printf (",");
-						std::cout << Modes.name (mode);
+							std::print (",");
+						std::print ("{}", Modes.name (mode));
 					}
 				}
 				else {
-					std::cout << "N/A";
+					std::print ("N/A");
 				}
-				std::cout << "\t";
+				std::print ("\t");
 				if (info.config_capabilities != 0) {
 					bool first = true;
 					for (unsigned int j = 0; j < 8; ++j) {
@@ -194,20 +191,20 @@ int main (int argc, char *argv[])
 						if (first)
 							first = false;
 						else
-							printf (",");
-						std::cout << Configs.name (config);
+							std::print (",");
+						std::print ("{}", Configs.name (config));
 					}
 				}
 				else {
-					std::cout << "N/A";
+					std::print ("N/A");
 				}
-				std::cout << std::endl;
+				std::println ("");
 			}
 		}
 		else if (op == "control") {
 			if (argc-first_arg < 1) {
 				bool swcontrol = iled.getSWControl ();
-				std::cout << (swcontrol ? "sw" : "hw") << std::endl;
+				std::println ("{}", swcontrol ? "sw" : "hw");
 			}
 			else {
 				std::string mode = argv[first_arg];
@@ -217,7 +214,7 @@ int main (int argc, char *argv[])
 					iled.setSWControl (false);
 				}
 				else {
-					std::cerr << "Invalid control mode." << std::endl;
+					std::println (stderr, "Invalid control mode.");
 					return EXIT_FAILURE;
 				}
 			}
@@ -227,14 +224,14 @@ int main (int argc, char *argv[])
 				unsigned int count = iled.getCount ();
 				for (unsigned int i = 0; i < count; ++i) {
 					auto state = iled.getState (i);
-					std::cout << i << "\t";
+					std::print ("{}\t", i);
 					print_state(state);
 				}
 			}
 			else {
 				int index = strtol (argv[first_arg], &endptr, 0);
 				if (*endptr != '\0' || index < 0 || index > 255) {
-					std::cerr << "Invalid LED index." << std::endl;
+					std::println (stderr, "Invalid LED index.");
 					return EXIT_FAILURE;
 				}
 				if (argc-first_arg < 2) {
@@ -247,12 +244,12 @@ int main (int argc, char *argv[])
 
 		}
 		else {
-			std::cerr << "Invalid operation: " << op << "." << std::endl;
+			std::println (stderr, "Invalid operation: {}.", op);
 			return EXIT_FAILURE;
 		}
 	}
 	catch (Error &e) {
-		std::cerr << "Error code " << e.errorCode () << ": " << e.what () << std::endl;
+		std::println (stderr, "Error code {}: {}", e.errorCode (), e.what ());
 		return e.errorCode ();
 	}
 

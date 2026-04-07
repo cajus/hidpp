@@ -23,6 +23,7 @@
 #include <hidpp20/IOnboardProfiles.h>
 
 #include <memory>
+#include <string>
 
 namespace HIDPP20
 {

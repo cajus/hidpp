@@ -25,6 +25,7 @@
 #include <list>
 #include <map>
 #include <chrono>
+#include <string>
 
 namespace HIDPP
 {

@@ -24,6 +24,7 @@
 #include <vector>
 #include <map>
 #include <cstdint>
+#include <string>
 
 namespace HIDPP
 {

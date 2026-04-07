@@ -22,6 +22,7 @@
 #include <hidpp/AbstractProfileDirectoryFormat.h>
 
 #include <memory>
+#include <string>
 
 namespace HIDPP10
 {

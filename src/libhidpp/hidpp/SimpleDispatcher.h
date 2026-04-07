@@ -21,6 +21,7 @@
 
 #include <hidpp/Dispatcher.h>
 #include <hid/RawDevice.h>
+#include <string>
 
 namespace HIDPP
 {

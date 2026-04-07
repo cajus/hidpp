@@ -18,6 +18,7 @@
 
 #include <cstdio>
 #include <memory>
+#include <print>
 
 #include <hidpp/SimpleDispatcher.h>
 #include <hidpp10/Device.h>
@@ -44,7 +45,7 @@ int main (int argc, char *argv[])
 		return EXIT_FAILURE;
 
 	if (argc-first_arg != 2) {
-		fprintf (stderr, "%s", getUsage (argv[0], args, &options).c_str ());
+		std::print (stderr, "{}", getUsage (argv[0], args, &options));
 		return EXIT_FAILURE;
 	}
 
@@ -56,7 +57,7 @@ int main (int argc, char *argv[])
 		dispatcher = std::make_unique<HIDPP::SimpleDispatcher> (path);
 	}
 	catch (std::exception &e) {
-		fprintf (stderr, "Failed to open device: %s.\n", e.what ());
+		std::println (stderr, "Failed to open device: {}.", e.what ());
 		return EXIT_FAILURE;
 	}
 	HIDPP10::Device dev (dispatcher.get (), device_index);
@@ -64,7 +65,7 @@ int main (int argc, char *argv[])
 	std::vector<uint8_t> data (PageSize);
 	fread (data.data (), sizeof(uint8_t), PageSize, stdin);
 	if (ferror (stdin)) {
-		fprintf (stderr, "Failed to read data.\n");
+		std::println (stderr, "Failed to read data.");
 		return EXIT_FAILURE;
 	}
 

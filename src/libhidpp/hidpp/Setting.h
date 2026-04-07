@@ -25,6 +25,7 @@
 #include <cstdint>
 
 #include <hidpp/Enum.h>
+#include <string>
 
 namespace HIDPP
 {

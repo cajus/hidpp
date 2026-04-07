@@ -16,8 +16,8 @@
  *
  */
 
-#include <cstdio>
 #include <cstring>
+#include <print>
 
 #include <misc/Log.h>
 #include <hid/DeviceMonitor.h>
@@ -53,13 +53,13 @@ protected:
 				try {
 					HIDPP::Device dev (&dispatcher, index);
 					auto version = dev.protocolVersion ();
-					printf ("%s", path);
+					std::print ("{}", path);
 					if (index != HIDPP::DefaultDevice)
-						printf (" (device %d)", index);
-					printf (": %s (%04hx:%04hx) HID++ %d.%d\n",
-							dev.name ().c_str (),
-							dispatcher.hidraw ().vendorID (), dev.productID (),
-							std::get<0> (version), std::get<1> (version));
+						std::print (" (device {})", static_cast<int> (index));
+					std::println (": {} ({:04x}:{:04x}) HID++ {}.{}",
+					              dev.name (),
+					              dispatcher.hidraw ().vendorID (), dev.productID (),
+					              std::get<0> (version), std::get<1> (version));
 					if (index == HIDPP::DefaultDevice && version == std::make_tuple (1, 0))
 						has_receiver_index = true;
 				}
@@ -105,7 +105,7 @@ int main (int argc, char *argv[])
 		return EXIT_FAILURE;
 
 	if (argc-first_arg != 0) {
-		fprintf (stderr, "%s", getUsage (argv[0], "", &options).c_str ());
+		std::print (stderr, "{}", getUsage (argv[0], "", &options));
 		return EXIT_FAILURE;
 	}
 

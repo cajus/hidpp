@@ -20,6 +20,7 @@
 #define LIBHIDPP_HIDPP_ABSTRACT_PROFILE_FORMAT_H
 
 #include <hidpp/Profile.h>
+#include <string>
 
 namespace HIDPP
 {

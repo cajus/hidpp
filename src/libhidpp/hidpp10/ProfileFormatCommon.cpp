@@ -1,6 +1,7 @@
 #include "ProfileFormatCommon.h"
 
 #include <hidpp/Field.h>
+#include <algorithm>
 
 using namespace HIDPP;
 using namespace HIDPP10;

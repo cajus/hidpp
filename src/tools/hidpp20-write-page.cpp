@@ -18,6 +18,7 @@
 
 #include <cstdio>
 #include <memory>
+#include <print>
 
 #include <hidpp/SimpleDispatcher.h>
 #include <hidpp20/Device.h>
@@ -55,7 +56,7 @@ int main (int argc, char *argv[])
 		return EXIT_FAILURE;
 
 	if (argc-first_arg != 2) {
-		fprintf (stderr, "%s", getUsage (argv[0], args, &options).c_str ());
+		std::print (stderr, "{}", getUsage (argv[0], args, &options));
 		return EXIT_FAILURE;
 	}
 
@@ -63,11 +64,11 @@ int main (int argc, char *argv[])
 	char *end;
 	int page = strtol (argv[first_arg+1], &end, 0);
 	if (*end != '\0') {
-		fprintf (stderr, "Page index must be a number.\n");
+		std::println (stderr, "Page index must be a number.");
 		return EXIT_FAILURE;
 	}
 	if (page < 0) {
-		fprintf (stderr, "Page index must be positive.\n");
+		std::println (stderr, "Page index must be positive.");
 		return EXIT_FAILURE;
 	}
 
@@ -76,7 +77,7 @@ int main (int argc, char *argv[])
 		dispatcher = std::make_unique<HIDPP::SimpleDispatcher> (path);
 	}
 	catch (std::exception &e) {
-		fprintf (stderr, "Failed to open device: %s.\n", e.what ());
+		std::println (stderr, "Failed to open device: {}.", e.what ());
 		return EXIT_FAILURE;
 	}
 	HIDPP20::Device dev (dispatcher.get (), device_index);
@@ -84,7 +85,7 @@ int main (int argc, char *argv[])
 	auto desc = iop.getDescription ();
 
 	if (page >= desc.sector_count) {
-		fprintf (stderr, "Page index too big: page count is %d.\n", desc.sector_count);
+		std::println (stderr, "Page index too big: page count is {}.", desc.sector_count);
 		return EXIT_FAILURE;
 	}
 
@@ -93,7 +94,7 @@ int main (int argc, char *argv[])
 	std::vector<uint8_t> data (desc.sector_size, 0xff);
 	fread (data.data (), sizeof (uint8_t), desc.sector_size, stdin);
 	if (ferror (stdin)) {
-		fprintf (stderr, "Failed to read data.\n");
+		std::println (stderr, "Failed to read data.");
 		return EXIT_FAILURE;
 	}
 	if (add_crc) {
@@ -111,7 +112,7 @@ int main (int argc, char *argv[])
 	}
 	catch (HIDPP20::Error &e) {
 		if (e.errorCode () == HIDPP20::Error::HWError) {
-			fprintf (stderr, "memoryWriteEnd returned Hardware Error, maybe the CRC in wrong but the page is actually written.\n");
+			std::println (stderr, "memoryWriteEnd returned Hardware Error, maybe the CRC in wrong but the page is actually written.");
 		}
 		else throw e;
 	}

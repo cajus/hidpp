@@ -18,10 +18,10 @@
 
 #include "Log.h"
 
-#include <iostream>
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
+#include <print>
 
 Log::Category::Category (const char *tag, bool enabled_by_default):
 	_enabled (enabled_by_default),
@@ -115,7 +115,7 @@ void Log::init (const char *setting_string)
 		std::string tag (current, sub);
 		auto it = categories_by_tag.find (tag);
 		if (it == categories_by_tag.end ())
-			std::cerr << "Invalid log category tag: " << tag << std::endl;
+			std::println (stderr, "Invalid log category tag: {}", tag);
 		else {
 			if (sub != next)
 				it->second->enable (std::string (sub+1, next), enabling);
@@ -151,7 +151,7 @@ void Log::printf (const char *format, ...)
 	vsnprintf (str, len+1, format, args);
 	current = str;
 	while (*current != '\0' && (end = strchr (current, '\n'))) {
-		*this << std::string (current, end) << std::endl;
+		*this << std::string (current, end) << '\n';
 		current = end+1;
 	}
 	if (*current != '\0') {
@@ -169,7 +169,7 @@ Log::LogBuf::LogBuf (const std::string &prefix):
 int Log::LogBuf::sync ()
 {
 	std::unique_lock<std::mutex> lock (_mutex);
-	std::cerr << "[" << _prefix << "] " << str ();
+	std::print (stderr, "[{}] {}", _prefix, str ());
 	str (std::string ());
 	return 0;
 }

@@ -21,6 +21,7 @@
 
 #include <stdexcept>
 #include <cstdint>
+#include <string>
 
 namespace HIDPP10
 {

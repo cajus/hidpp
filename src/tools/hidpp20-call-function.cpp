@@ -19,8 +19,8 @@
 #include <hidpp/SimpleDispatcher.h>
 #include <hidpp20/Device.h>
 #include <hidpp20/Error.h>
-#include <cstdio>
 #include <memory>
+#include <print>
 
 #include "common/common.h"
 #include "common/Option.h"
@@ -43,8 +43,8 @@ int main (int argc, char *argv[])
 		return EXIT_FAILURE;
 
 	if (argc-first_arg < 3) {
-		fprintf (stderr, "Too few arguments.\n");
-		fprintf (stderr, "%s", getUsage (argv[0], args, &options).c_str ());
+		std::println (stderr, "Too few arguments.");
+		std::print (stderr, "{}", getUsage (argv[0], args, &options));
 		return EXIT_FAILURE;
 	}
 
@@ -53,12 +53,12 @@ int main (int argc, char *argv[])
 	const char *path = argv[first_arg];
 	int feature_index = strtol (argv[first_arg+1], &endptr, 0);
 	if (*endptr != '\0' || feature_index < 0 || feature_index > 255) {
-		fprintf (stderr, "Invalid feature index.\n");
+		std::println (stderr, "Invalid feature index.");
 		return EXIT_FAILURE;
 	}
 	int function = strtol (argv[first_arg+2], &endptr, 0);
 	if (*endptr != '\0' || function < 0 || function > 15) {
-		fprintf (stderr, "Invalid function.\n");
+		std::println (stderr, "Invalid function.");
 		return EXIT_FAILURE;
 	}
 
@@ -66,7 +66,7 @@ int main (int argc, char *argv[])
 	for (int i = 0; first_arg+3+i < argc; ++i) {
 		int value = strtol (argv[first_arg+3+i], &endptr, 16);
 		if (*endptr != '\0' || value < 0 || value > 255) {
-			fprintf (stderr, "Invalid parameter %d value.\n", i);
+			std::println (stderr, "Invalid parameter {} value.", i);
 			return EXIT_FAILURE;
 		}
 		params.push_back (static_cast<uint8_t> (value));
@@ -77,7 +77,7 @@ int main (int argc, char *argv[])
 		dispatcher = std::make_unique<HIDPP::SimpleDispatcher> (path);
 	}
 	catch (std::exception &e) {
-		fprintf (stderr, "Failed to open device: %s.\n", e.what ());
+		std::println (stderr, "Failed to open device: {}.", e.what ());
 		return EXIT_FAILURE;
 	}
 	HIDPP20::Device dev (dispatcher.get (), device_index);
@@ -87,7 +87,7 @@ int main (int argc, char *argv[])
 					    params);
 	}
 	catch (HIDPP20::Error &e) {
-		fprintf (stderr, "Error code %d: %s\n", e.errorCode (), e.what ());
+		std::println (stderr, "Error code {}: {}", e.errorCode (), e.what ());
 		return e.errorCode ();
 	}
 
@@ -96,10 +96,10 @@ int main (int argc, char *argv[])
 		if (first)
 			first = false;
 		else
-			printf (" ");
-		printf ("%02hhx", value);
+			std::print (" ");
+		std::print ("{:02x}", value);
 	}
-	printf ("\n");
+	std::println ("");
 
 	return EXIT_SUCCESS;
 }

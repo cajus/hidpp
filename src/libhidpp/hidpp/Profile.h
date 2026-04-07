@@ -21,6 +21,7 @@
 
 #include <hidpp/Address.h>
 #include <hidpp/Setting.h>
+#include <string>
 
 namespace HIDPP
 {

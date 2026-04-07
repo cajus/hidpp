@@ -16,7 +16,7 @@
  *
  */
 
-#include <cstdio>
+#include <print>
 #include <vector>
 #include <map>
 #include <cassert>
@@ -231,7 +231,7 @@ public:
 			throw;
 		}
 
-		printf ("Added touchpad device: %s\n", _dev.name ().c_str ());
+		std::println ("Added touchpad device: {}", _dev.name ());
 		addEvent (index, _itrxy.index (), true);
 		_itrxy.setTouchpadRawMode (true);
 	}

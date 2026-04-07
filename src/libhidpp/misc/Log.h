@@ -19,12 +19,12 @@
 #ifndef LIBHIDPP_LOG_H
 #define LIBHIDPP_LOG_H
 
+#include <format>
+#include <map>
+#include <mutex>
 #include <ostream>
 #include <sstream>
-#include <iomanip>
-#include <map>
-#include <algorithm>
-#include <mutex>
+#include <string>
 
 class Log: public std::ostream
 {
@@ -112,16 +112,10 @@ public:
 			 InputIterator begin, InputIterator end) {
 		if (!*this)
 			return;
-		*this << prefix;
-		for (auto it = begin; it != end; ++it) {
-			uint8_t byte = *it;
-			*this << " "
-			      << std::hex
-			      << std::setw (2)
-			      << std::setfill ('0')
-			      << static_cast<unsigned int> (byte);
-		}
-		*this << std::endl;
+		std::string line = prefix;
+		for (auto it = begin; it != end; ++it)
+			line += std::format (" {:02x}", static_cast<uint8_t> (*it));
+		*this << line << '\n';
 	}
 
 private:

@@ -21,6 +21,7 @@
 
 #include <hidpp/Setting.h>
 #include <misc/Log.h>
+#include <string>
 
 namespace HIDPP
 {

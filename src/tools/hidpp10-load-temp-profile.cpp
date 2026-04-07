@@ -16,9 +16,9 @@
  *
  */
 
-#include <cstdio>
 #include <iostream>
 #include <fstream>
+#include <print>
 
 #include <hidpp/SimpleDispatcher.h>
 #include <hidpp10/Device.h>
@@ -60,7 +60,7 @@ int main (int argc, char *argv[])
 		return EXIT_FAILURE;
 
 	if (argc-first_arg < 1 || argc-first_arg > 2) {
-		fprintf (stderr, "%s", getUsage (argv[0], args, &options).c_str ());
+		std::print (stderr, "{}", getUsage (argv[0], args, &options));
 		return EXIT_FAILURE;
 	}
 
@@ -69,7 +69,7 @@ int main (int argc, char *argv[])
 		dispatcher = std::make_unique<HIDPP::SimpleDispatcher> (argv[first_arg]);
 	}
 	catch (std::exception &e) {
-		fprintf (stderr, "Failed to open device: %s.\n", e.what ());
+		std::println (stderr, "Failed to open device: {}.", e.what ());
 		return EXIT_FAILURE;
 	}
 
@@ -100,7 +100,7 @@ int main (int argc, char *argv[])
 	tinyxml2::XMLDocument doc;
 	doc.Parse (xml.c_str ());
 	if (doc.Error ()) {
-		fprintf (stderr, "Error parsing XML:\n%s\n", doc.ErrorStr ());
+		std::println (stderr, "Error parsing XML:\n{}", doc.ErrorStr ());
 		return EXIT_FAILURE;
 	}
 
@@ -124,7 +124,7 @@ int main (int argc, char *argv[])
 		}
 	}
 	catch (std::out_of_range &e) {
-		fprintf (stderr, "Cannot write macros: too long for RAM.\n");
+		std::println (stderr, "Cannot write macros: too long for RAM.");
 		return EXIT_FAILURE;
 	}
 	Address profile_addr { 0, 0, 0 };

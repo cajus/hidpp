@@ -21,6 +21,10 @@
 
 #include <hidpp/Device.h>
 
+#include <cstdint>
+#include <span>
+#include <vector>
+
 namespace HIDPP { class Dispatcher; }
 
 namespace HIDPP20 {
@@ -32,17 +36,17 @@ public:
 	Device (HIDPP::Dispatcher *dispatcher, HIDPP::DeviceIndex device_index = HIDPP::DefaultDevice);
 	Device (HIDPP::Device &&other);
 
-	std::vector<uint8_t> callFunction (uint8_t feature_index,
-					   unsigned int function,
-					   std::vector<uint8_t>::const_iterator param_begin,
-					   std::vector<uint8_t>::const_iterator param_end);
-
-	inline std::vector<uint8_t> callFunction (uint8_t feature_index,
-						  unsigned int function,
-						  const std::vector<uint8_t> params = {})
-	{
-		return callFunction (feature_index, function, params.begin (), params.end ());
-	}
+	/**
+	 * Send a HID++ 2.0 feature call and return the response parameters.
+	 *
+	 * \param feature_index  Feature table index (from IRoot::getFeature).
+	 * \param function       Function code within the feature.
+	 * \param params         Parameter bytes (must fit in a single HID++ report).
+	 * \returns Response parameter bytes.
+	 */
+	[[nodiscard]] std::vector<uint8_t> callFunction (uint8_t feature_index,
+	                                                  unsigned int function,
+	                                                  std::span<const uint8_t> params = {});
 };
 
 }

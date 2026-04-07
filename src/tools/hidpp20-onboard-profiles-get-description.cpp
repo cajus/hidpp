@@ -16,14 +16,13 @@
  *
  */
 
-#include <cstdio>
 #include <memory>
+#include <print>
 
 #include <hidpp/SimpleDispatcher.h>
 #include <hidpp20/Device.h>
 #include <hidpp20/Error.h>
 #include <hidpp20/IOnboardProfiles.h>
-#include <cstdio>
 
 #include "common/common.h"
 #include "common/Option.h"
@@ -46,8 +45,8 @@ int main (int argc, char *argv[])
 		return EXIT_FAILURE;
 
 	if (argc-first_arg < 1) {
-		fprintf (stderr, "Too few arguments.\n");
-		fprintf (stderr, "%s", getUsage (argv[0], args, &options).c_str ());
+		std::println (stderr, "Too few arguments.");
+		std::print (stderr, "{}", getUsage (argv[0], args, &options));
 		return EXIT_FAILURE;
 	}
 
@@ -56,7 +55,7 @@ int main (int argc, char *argv[])
 		dispatcher = std::make_unique<HIDPP::SimpleDispatcher> (argv[first_arg]);
 	}
 	catch (std::exception &e) {
-		fprintf (stderr, "Failed to open device: %s.\n", e.what ());
+		std::println (stderr, "Failed to open device: {}.", e.what ());
 		return EXIT_FAILURE;
 	}
 
@@ -64,47 +63,47 @@ int main (int argc, char *argv[])
 	try {
 		HIDPP20::IOnboardProfiles iop (&dev);
 		auto desc = iop.getDescription ();
-		printf ("Memory model:\t%hhu\n", static_cast<uint8_t> (desc.memory_model));
-		printf ("Profile format:\t%hhu\n", static_cast<uint8_t> (desc.profile_format));
-		printf ("Macro format:\t%hhu\n", static_cast<uint8_t> (desc.macro_format));
-		printf ("Profile count:\t%hhu\n", desc.profile_count);
-		printf ("Profile count OOB:\t%hhu\n", desc.profile_count_oob);
-		printf ("Button count:\t%hhu\n", desc.button_count);
-		printf ("Sector count:\t%hhu\n", desc.sector_count);
-		printf ("Sector size:\t%hu\n", desc.sector_size);
-		printf ("Mechanical layout:\t0x%hhx (", desc.mechanical_layout);
+		std::println ("Memory model:\t{}", static_cast<uint8_t> (desc.memory_model));
+		std::println ("Profile format:\t{}", static_cast<uint8_t> (desc.profile_format));
+		std::println ("Macro format:\t{}", static_cast<uint8_t> (desc.macro_format));
+		std::println ("Profile count:\t{}", desc.profile_count);
+		std::println ("Profile count OOB:\t{}", desc.profile_count_oob);
+		std::println ("Button count:\t{}", desc.button_count);
+		std::println ("Sector count:\t{}", desc.sector_count);
+		std::println ("Sector size:\t{}", desc.sector_size);
+		std::print ("Mechanical layout:\t0x{:x} (", desc.mechanical_layout);
 		bool first = true;
 		if ((desc.mechanical_layout & 0x03) == 2) {
 			if (first)
 				first = false;
 			else
-				printf  (", ");
-			printf ("G-shift");
+				std::print (", ");
+			std::print ("G-shift");
 		}
 		if ((desc.mechanical_layout & 0x0c) >> 2 == 2) {
 			if (first)
 				first = false;
 			else
-				printf  (", ");
-			printf ("DPI shift");
+				std::print (", ");
+			std::print ("DPI shift");
 		}
-		printf (")\n");
-		printf ("Various info:\t0x%hhx (", desc.various_info);
+		std::println (")");
+		std::print ("Various info:\t0x{:x} (", desc.various_info);
 		switch (desc.various_info & 0x07) {
 		case 1:
-			printf ("Corded");
+			std::print ("Corded");
 			break;
 		case 2:
-			printf ("Wireless");
+			std::print ("Wireless");
 			break;
 		case 4:
-			printf ("Corded + Wireless");
+			std::print ("Corded + Wireless");
 			break;
 		}
-		printf (")\n");
+		std::println (")");
 	}
 	catch (HIDPP20::Error &e) {
-		fprintf (stderr, "Error code %d: %s\n", e.errorCode (), e.what ());
+		std::println (stderr, "Error code {}: {}", e.errorCode (), e.what ());
 		return e.errorCode ();
 	}
 

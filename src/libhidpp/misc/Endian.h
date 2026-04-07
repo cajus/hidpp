@@ -19,90 +19,111 @@
 #ifndef LIBHIDPP_ENDIAN_H
 #define LIBHIDPP_ENDIAN_H
 
-#include <tuple>
+#include <array>
+#include <bit>
+#include <concepts>
+#include <cstdint>
 
-template<typename T, typename InputIt>
-typename std::enable_if<std::is_integral<T>::value, InputIt>::type
-writeLE (InputIt it, T value)
+// ── little-endian write ───────────────────────────────────────────────────────
+
+template<std::integral T, typename OutputIt>
+OutputIt writeLE (OutputIt it, T value)
 {
-	for (int i = 0; i < (int) sizeof (T); ++i)
-		*(it++) = (value >> (i*8)) & 0xFF;
+	if constexpr (std::endian::native != std::endian::little)
+		value = std::byteswap (value);
+	auto bytes = std::bit_cast<std::array<uint8_t, sizeof (T)>> (value);
+	for (auto b : bytes)
+		*(it++) = b;
 	return it;
 }
 
-template<typename T, typename Container>
-typename std::enable_if<std::is_integral<T>::value>::type
-writeLE (Container &cont, unsigned int index, T value)
+template<std::integral T, typename Container>
+void writeLE (Container &cont, unsigned int index, T value)
 {
-	writeLE (cont.begin () + index, value);
+	writeLE<T> (cont.begin () + index, value);
 }
 
-template<typename T, typename InputIt>
-typename std::enable_if<std::is_integral<T>::value, T>::type
-readLE (InputIt it)
+// ── little-endian read ────────────────────────────────────────────────────────
+
+template<std::integral T, typename InputIt>
+T readLE (InputIt it)
 {
-	T value = 0;
-	for (int i = 0; i < (int) sizeof (T); ++i)
-		value |= *(it++) << (i*8);
+	std::array<uint8_t, sizeof (T)> bytes;
+	for (auto &b : bytes)
+		b = static_cast<uint8_t> (*(it++));
+	auto value = std::bit_cast<T> (bytes);
+	if constexpr (std::endian::native != std::endian::little)
+		value = std::byteswap (value);
 	return value;
 }
 
-template<typename T, typename Container>
-typename std::enable_if<std::is_integral<T>::value, T>::type
-readLE (const Container &cont, unsigned int index)
+template<std::integral T, typename Container>
+T readLE (const Container &cont, unsigned int index)
 {
 	return readLE<T> (cont.begin () + index);
 }
 
-template<typename T, typename Container>
-typename std::enable_if<std::is_integral<T>::value>::type
-pushLE (Container &cont, T value)
+// ── little-endian push ────────────────────────────────────────────────────────
+
+template<std::integral T, typename Container>
+void pushLE (Container &cont, T value)
 {
-	for (int i = 0; i < (int) sizeof (T); ++i)
-		cont.push_back ((value >> (i*8)) & 0xFF);
+	if constexpr (std::endian::native != std::endian::little)
+		value = std::byteswap (value);
+	auto bytes = std::bit_cast<std::array<uint8_t, sizeof (T)>> (value);
+	for (auto b : bytes)
+		cont.push_back (b);
 }
 
-template<typename T, typename InputIt>
-typename std::enable_if<std::is_integral<T>::value, InputIt>::type
-writeBE (InputIt it, T value)
+// ── big-endian write ──────────────────────────────────────────────────────────
+
+template<std::integral T, typename OutputIt>
+OutputIt writeBE (OutputIt it, T value)
 {
-	for (int i = sizeof (T)-1; i >= 0; --i)
-		*(it++) = (value >> (i*8)) & 0xFF;
+	if constexpr (std::endian::native != std::endian::big)
+		value = std::byteswap (value);
+	auto bytes = std::bit_cast<std::array<uint8_t, sizeof (T)>> (value);
+	for (auto b : bytes)
+		*(it++) = b;
 	return it;
 }
 
-template<typename T, typename Container>
-typename std::enable_if<std::is_integral<T>::value>::type
-writeBE (Container &cont, unsigned int index, T value)
+template<std::integral T, typename Container>
+void writeBE (Container &cont, unsigned int index, T value)
 {
-	writeBE (cont.begin () + index, value);
+	writeBE<T> (cont.begin () + index, value);
 }
 
+// ── big-endian read ───────────────────────────────────────────────────────────
 
-template<typename T, typename InputIt>
-typename std::enable_if<std::is_integral<T>::value, T>::type
-readBE (InputIt it)
+template<std::integral T, typename InputIt>
+T readBE (InputIt it)
 {
-	T value = 0;
-	for (int i = sizeof (T)-1; i >= 0; --i)
-		value |= *(it++) << (i*8);
+	std::array<uint8_t, sizeof (T)> bytes;
+	for (auto &b : bytes)
+		b = static_cast<uint8_t> (*(it++));
+	auto value = std::bit_cast<T> (bytes);
+	if constexpr (std::endian::native != std::endian::big)
+		value = std::byteswap (value);
 	return value;
 }
 
-template<typename T, typename Container>
-typename std::enable_if<std::is_integral<T>::value, T>::type
-readBE (const Container &cont, unsigned int index)
+template<std::integral T, typename Container>
+T readBE (const Container &cont, unsigned int index)
 {
 	return readBE<T> (cont.begin () + index);
 }
 
-template<typename T, typename Container>
-typename std::enable_if<std::is_integral<T>::value>::type
-pushBE (Container &cont, T value)
+// ── big-endian push ───────────────────────────────────────────────────────────
+
+template<std::integral T, typename Container>
+void pushBE (Container &cont, T value)
 {
-	for (int i = sizeof (T)-1; i >= 0; --i)
-		cont.push_back ((value >> (i*8)) & 0xFF);
+	if constexpr (std::endian::native != std::endian::big)
+		value = std::byteswap (value);
+	auto bytes = std::bit_cast<std::array<uint8_t, sizeof (T)>> (value);
+	for (auto b : bytes)
+		cont.push_back (b);
 }
 
 #endif
-

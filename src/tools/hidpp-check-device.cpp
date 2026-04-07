@@ -16,7 +16,7 @@
  *
  */
 
-#include <cstdio>
+#include <print>
 
 #include <hidpp/SimpleDispatcher.h>
 #include <hidpp/Device.h>
@@ -44,25 +44,24 @@ int main (int argc, char *argv[])
 		return EXIT_FAILURE;
 
 	if (argc-first_arg != 1) {
-		fprintf (stderr, "%s", getUsage (argv[0], args, &options).c_str ());
+		std::print (stderr, "{}", getUsage (argv[0], args, &options));
 		return EXIT_FAILURE;
 	}
 
 	const char *path = argv[first_arg];
 
 	try {
-		unsigned int major, minor;
 		HIDPP::SimpleDispatcher dispatcher (path);
 		try {
 			HIDPP::Device dev (&dispatcher, device_index);
-			std::tie (major, minor) = dev.protocolVersion ();
-			printf ("%d.%d\n", major, minor);
+			auto [major, minor] = dev.protocolVersion ();
+			std::println ("{}.{}", major, minor);
 			Log::info ().printf ("Device is %s (%04hx:%04hx)\n",
 					     dev.name ().c_str (),
 					     dispatcher.hidraw ().vendorID (), dev.productID ());
 		}
 		catch (std::exception &e) {
-			fprintf (stderr, "Error accessing device: %s\n", e.what ());
+			std::println (stderr, "Error accessing device: {}", e.what ());
 			return EXIT_FAILURE;
 		}
 	}
@@ -71,7 +70,7 @@ int main (int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 	catch (std::system_error &e) {
-		fprintf (stderr, "Failed to open %s: %s\n", path, e.what ());
+		std::println (stderr, "Failed to open {}: {}", path, e.what ());
 		return EXIT_FAILURE;
 	}
 	return EXIT_SUCCESS;

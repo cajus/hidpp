@@ -21,6 +21,7 @@
 #include <misc/Endian.h>
 
 #include <cassert>
+#include <span>
 
 using namespace HIDPP20;
 
@@ -97,7 +98,7 @@ void IOnboardProfiles::memoryAddrWrite (unsigned int page, unsigned int offset, 
 void IOnboardProfiles::memoryWrite (std::vector<uint8_t>::const_iterator begin, std::vector<uint8_t>::const_iterator end)
 {
 	assert (std::distance (begin, end) <= LineSize);
-	call (MemoryWrite, begin, end);
+	call (MemoryWrite, std::span<const uint8_t> (begin, end));
 }
 
 void IOnboardProfiles::memoryWriteEnd ()
