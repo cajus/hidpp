@@ -92,9 +92,13 @@ int main (int argc, char *argv[])
 	iop.memoryAddrWrite (page, 0, desc.sector_size);
 
 	std::vector<uint8_t> data (desc.sector_size, 0xff);
-	fread (data.data (), sizeof (uint8_t), desc.sector_size, stdin);
+	std::size_t bytes_read = fread (data.data (), sizeof (uint8_t), desc.sector_size, stdin);
 	if (ferror (stdin)) {
 		std::println (stderr, "Failed to read data.");
+		return EXIT_FAILURE;
+	}
+	if (bytes_read != desc.sector_size) {
+		std::println (stderr, "Short read: got {} bytes, expected {}.", bytes_read, desc.sector_size);
 		return EXIT_FAILURE;
 	}
 	if (add_crc) {

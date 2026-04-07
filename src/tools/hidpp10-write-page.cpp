@@ -63,9 +63,13 @@ int main (int argc, char *argv[])
 	HIDPP10::Device dev (dispatcher.get (), device_index);
 	static constexpr std::size_t PageSize = 512;
 	std::vector<uint8_t> data (PageSize);
-	fread (data.data (), sizeof(uint8_t), PageSize, stdin);
+	std::size_t bytes_read = fread (data.data (), sizeof(uint8_t), PageSize, stdin);
 	if (ferror (stdin)) {
 		std::println (stderr, "Failed to read data.");
+		return EXIT_FAILURE;
+	}
+	if (bytes_read != PageSize) {
+		std::println (stderr, "Short read: got {} bytes, expected {}.", bytes_read, PageSize);
 		return EXIT_FAILURE;
 	}
 

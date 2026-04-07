@@ -77,38 +77,6 @@ jobs:
       #    UBSAN_OPTIONS: ${{ matrix.ubsan_options }}
       #  run: ctest --test-dir build --output-on-failure
 
-  macos:
-    if: false
-    name: macOS (macos-15, Clang/Xcode 16)
-    runs-on: macos-15
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install dependencies
-        run: |
-          brew install \
-            ninja \
-            hidapi \
-            libusb \
-            tinyxml2 \
-            pybind11
-
-      - name: Configure
-        run: |
-          cmake -B build -G Ninja \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DHID_BACKEND=hidapi \
-            -DBUILD_TOOLS=ON \
-            -DBUILD_TESTS=ON \
-            -DBUILD_PYTHON_BINDINGS=ON
-
-      - name: Build
-        run: cmake --build build
-
-      #- name: Test
-      #  run: ctest --test-dir build --output-on-failure
-
   windows:
     name: Windows (windows-2022, MSVC)
     runs-on: windows-2022
