@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.28)
 project(hidpp)
 
+option(ENABLE_STATIC_ANALYZER "Build with static code analyzer" OFF)
+option(ENABLE_SANATIZERS "Build with sanatizer support" OFF)
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 option(BUILD_TOOLS "Build HID++ command line tools" ON)
 option(INSTALL_UDEV_RULES "Install udev rules for user access to HID++ devices (requires building tools)" OFF)

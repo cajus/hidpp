@@ -69,6 +69,23 @@ if("${HID_BACKEND}" STREQUAL "windows")
 endif()
 
 add_library(hidpp ${LIBHIDPP_SOURCES})
+
+if(ENABLE_STATIC_ANALYZER)
+    find_program(CLANG_TIDY clang-tidy)
+    set_target_properties(hidpp PROPERTIES
+        CXX_CLANG_TIDY "${CLANG_TIDY};-checks=modernize-*,bugprone-*"
+    )
+elseif(ENABLE_SANITIZERS)
+    target_compile_options(hidpp PRIVATE
+        -fsanitize=address,undefined
+        -fno-omit-frame-pointer
+        -g
+    )
+    target_link_options(hidpp PRIVATE
+        -fsanitize=address,undefined
+    )
+endif()
+
 set_target_properties(hidpp PROPERTIES VERSION 0.2)
 target_include_directories(hidpp PUBLIC
 	$<INSTALL_INTERFACE:include/hidpp>
