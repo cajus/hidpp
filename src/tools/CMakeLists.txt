@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.28)
 project(hidpp_tools)
 
 if (WIN32 AND NOT MINGW)
