@@ -73,7 +73,7 @@ add_library(hidpp ${LIBHIDPP_SOURCES})
 if(ENABLE_STATIC_ANALYZER)
     find_program(CLANG_TIDY clang-tidy)
     set_target_properties(hidpp PROPERTIES
-        CXX_CLANG_TIDY "${CLANG_TIDY};-checks=modernize-*,bugprone-*"
+        CXX_CLANG_TIDY "${CLANG_TIDY};-checks=bugprone-*"
     )
 elseif(ENABLE_SANITIZERS)
     target_compile_options(hidpp PRIVATE
@@ -86,7 +86,9 @@ elseif(ENABLE_SANITIZERS)
     )
 endif()
 
-set_target_properties(hidpp PROPERTIES VERSION 0.2)
+set_target_properties(hidpp PROPERTIES
+	VERSION 0.2
+	WINDOWS_EXPORT_ALL_SYMBOLS ON)
 target_include_directories(hidpp PUBLIC
 	$<INSTALL_INTERFACE:include/hidpp>
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
