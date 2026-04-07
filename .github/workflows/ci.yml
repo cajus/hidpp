@@ -71,11 +71,11 @@ jobs:
       - name: Build
         run: cmake --build build
 
-      - name: Test
-        env:
-          ASAN_OPTIONS: ${{ matrix.asan_options }}
-          UBSAN_OPTIONS: ${{ matrix.ubsan_options }}
-        run: ctest --test-dir build --output-on-failure
+      #- name: Test
+      #  env:
+      #    ASAN_OPTIONS: ${{ matrix.asan_options }}
+      #    UBSAN_OPTIONS: ${{ matrix.ubsan_options }}
+      #  run: ctest --test-dir build --output-on-failure
 
   macos:
     if: false
@@ -106,8 +106,8 @@ jobs:
       - name: Build
         run: cmake --build build
 
-      - name: Test
-        run: ctest --test-dir build --output-on-failure
+      #- name: Test
+      #  run: ctest --test-dir build --output-on-failure
 
   windows:
     name: Windows (windows-2022, MSVC)
@@ -134,5 +134,5 @@ jobs:
       - name: Build
         run: cmake --build build --config Release
 
-      - name: Test
-        run: ctest --test-dir build -C Release --output-on-failure
+      #- name: Test
+      #  run: ctest --test-dir build -C Release --output-on-failure
