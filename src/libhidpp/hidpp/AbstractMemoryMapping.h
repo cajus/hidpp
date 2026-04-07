@@ -38,6 +38,7 @@ namespace HIDPP
 class AbstractMemoryMapping
 {
 public:
+	virtual ~AbstractMemoryMapping () = default;
 	AbstractMemoryMapping (bool write_crc = true);
 
 	/**

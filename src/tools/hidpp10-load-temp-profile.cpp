@@ -112,7 +112,7 @@ int main (int argc, char *argv[])
 	profxml.read (doc.RootElement (), profile, entry, macros);
 
 	try {
-		HIDPP::Address macro_address { 0, 0, (profile_format->size ()+1)/2 };
+		HIDPP::Address macro_address { 0, 0, static_cast<unsigned int> ((profile_format->size ()+1)/2) };
 		for (unsigned int i = 0; i < profile.buttons.size (); ++i) {
 			auto &button = profile.buttons[i];
 			if (button.type () == HIDPP::Profile::Button::Type::Macro) {
