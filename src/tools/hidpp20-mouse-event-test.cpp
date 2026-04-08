@@ -42,6 +42,7 @@ using namespace HIDPP20;
 class EventHandler
 {
 public:
+	virtual ~EventHandler () = default;
 	virtual const HIDPP20::FeatureInterface *feature () const = 0;
 	virtual void handleEvent (const HIDPP::Report &event) = 0;
 };

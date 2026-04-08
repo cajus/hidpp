@@ -46,7 +46,7 @@ std::vector<uint8_t>::iterator MemoryMapping::getWritableIterator (const Address
 bool MemoryMapping::computeOffset (std::vector<uint8_t>::const_iterator it, Address &address)
 {
 	auto &page = getReadOnlyPage (address);
-	int dist = distance (page.begin (), it);
+	int dist = static_cast<int> (distance (page.begin (), it));
 	address.offset = dist;
 	return true;
 }

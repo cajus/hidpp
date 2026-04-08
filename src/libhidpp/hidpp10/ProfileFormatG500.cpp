@@ -74,8 +74,8 @@ const EnumDesc ProfileFormatG500::SpecialActions = {
 ProfileFormatG500::ProfileFormatG500 (const Sensor &sensor):
 	AbstractProfileFormat (ProfileSize, MaxButtonCount, MaxModeCount),
 	_sensor (sensor),
-	_dpi_setting (sensor.minimumResolution (), sensor.maximumResolution (),
-			std::min (800u, sensor.maximumResolution ())),
+	_dpi_setting (static_cast<int> (sensor.minimumResolution ()), static_cast<int> (sensor.maximumResolution ()),
+			static_cast<int> (std::min (800u, sensor.maximumResolution ()))),
 	_mode_settings {
 		{ "dpi_x", _dpi_setting },
 		{ "dpi_y", _dpi_setting },

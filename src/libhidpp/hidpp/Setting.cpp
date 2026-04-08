@@ -280,7 +280,7 @@ Setting SettingDesc::convertFromString (const std::string &str) const
 
 	case Setting::Type::Integer: {
 		char *end;
-		int value = strtol (str.c_str (), &end, 0);
+		int value = static_cast<int> (strtol (str.c_str (), &end, 0));
 		if (*end != '\0')
 			throw std::runtime_error ("string is not a number");
 		if (value < _min || value > _max)

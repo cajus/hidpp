@@ -276,7 +276,7 @@ Profile ProfileFormat::read (std::vector<uint8_t>::const_iterator begin) const
 {
 	using namespace Fields;
 	for (unsigned int i = 0; i < 16; ++i)
-		Log::debug ().printBytes ("profile", begin+16*i, begin+16*(i+1));
+		Log::debug ().printBytes ("profile", begin+static_cast<std::ptrdiff_t> (16*i), begin+static_cast<std::ptrdiff_t> (16*(i+1)));
 	// TODO: missing settings
 	// TODO: add settings depending on desc
 	Profile profile;
@@ -330,7 +330,7 @@ Profile ProfileFormat::read (std::vector<uint8_t>::const_iterator begin) const
 void ProfileFormat::write (const Profile &profile, std::vector<uint8_t>::iterator begin) const
 {
 	using namespace Fields;
-	std::fill (begin, begin + ProfileLength.at (_desc.profile_format), 0xff);
+	std::fill (begin, begin + static_cast<std::ptrdiff_t> (ProfileLength.at (_desc.profile_format)), 0xff);
 	SettingLookup general (profile.settings, _general_settings);
 	ReportRate.write (begin, general.get<int> ("report_rate"));
 	DefaultDPI.write (begin, general.get<int> ("default_dpi"));

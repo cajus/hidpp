@@ -33,19 +33,19 @@ RAMMapping::RAMMapping (Device *dev):
 std::vector<uint8_t>::const_iterator RAMMapping::getReadOnlyIterator (const Address &address)
 {
 	auto &page = getReadOnlyPage (address);
-	return page.begin () + address.offset*2;
+	return page.begin () + static_cast<std::ptrdiff_t> (address.offset) * 2;
 }
 
 std::vector<uint8_t>::iterator RAMMapping::getWritableIterator (const Address &address)
 {
 	auto &page = getWritablePage (address);
-	return page.begin () + address.offset*2;
+	return page.begin () + static_cast<std::ptrdiff_t> (address.offset) * 2;
 }
 
 bool RAMMapping::computeOffset (std::vector<uint8_t>::const_iterator it, Address &address)
 {
 	auto &page = getReadOnlyPage (address);
-	int dist = distance (page.begin (), it);
+	int dist = static_cast<int> (distance (page.begin (), it));
 	if (dist % 2 == 1)
 		return false;
 	address.offset = dist/2;

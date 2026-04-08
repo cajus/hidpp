@@ -80,8 +80,8 @@ const EnumDesc ProfileFormatG9::SpecialActions = {
 ProfileFormatG9::ProfileFormatG9 (const Sensor &sensor):
 	AbstractProfileFormat (ProfileSize, MaxButtonCount, MaxModeCount),
 	_sensor (sensor),
-	_dpi_setting (sensor.minimumResolution (), sensor.maximumResolution (),
-			std::min (800u, sensor.maximumResolution ())),
+	_dpi_setting (static_cast<int> (sensor.minimumResolution ()), static_cast<int> (sensor.maximumResolution ()),
+			static_cast<int> (std::min (800u, sensor.maximumResolution ()))),
 	_mode_settings {
 		{ "dpi", _dpi_setting },
 		{ "leds", SettingDesc (LEDVector (LEDCount, false)) },

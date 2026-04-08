@@ -53,7 +53,7 @@ ITouchpadRawXY::TouchpadRawData ITouchpadRawXY::touchpadRawEvent (const HIDPP::R
 	auto params = event.parameterBegin ();
 	data.seqnum = readBE<uint16_t> (params+0);
 	for (unsigned int i = 0; i < 2; ++i) {
-		auto pdata = params+2+7*i;
+		auto pdata = params+2+static_cast<std::ptrdiff_t> (7*i);
 		data.points[i].x = readBE<int16_t> (pdata+0);
 		data.points[i].y = readBE<int16_t> (pdata+2);
 		data.points[i].unknown0 = pdata[4];

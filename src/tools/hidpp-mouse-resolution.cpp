@@ -59,6 +59,7 @@ public:
 	{
 	}
 
+	virtual ~Operations () = default;
 	virtual void set (unsigned int dpi_x, unsigned int dpi_y) = 0;
 	virtual void get (unsigned int &dpi_x, unsigned int &dpi_y) = 0;
 	virtual void info () = 0;

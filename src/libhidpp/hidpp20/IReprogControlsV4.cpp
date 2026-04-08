@@ -77,7 +77,7 @@ std::vector<uint16_t> IReprogControlsV4::divertedButtonEvent (const HIDPP::Repor
 	std::vector<uint16_t> buttons;
 	auto params = event.parameterBegin ();
 	for (unsigned int i = 0; i < 4; ++i) {
-		uint16_t control_id = readBE<uint16_t> (params + 2*i);
+		uint16_t control_id = readBE<uint16_t> (params + static_cast<std::ptrdiff_t> (2*i));
 		if (control_id == 0)
 			break;
 		buttons.push_back (control_id);

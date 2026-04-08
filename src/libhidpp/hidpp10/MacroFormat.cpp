@@ -190,8 +190,8 @@ MacroFormat::writeItem (std::vector<uint8_t>::iterator it,
 		jump_addr_it = it;
 		return it+2;
 	case Macro::Item::MousePointer:
-		it = writeBE<int16_t> (it, item.mouseX ());
-		it = writeBE<int16_t> (it, item.mouseY ());
+		it = writeBE<int16_t> (it, static_cast<short> (item.mouseX ()));
+		it = writeBE<int16_t> (it, static_cast<short> (item.mouseY ()));
 		return it;
 	case Macro::Item::JumpIfReleased:
 		it = writeBE<uint16_t> (it, item.delay ());

@@ -138,7 +138,7 @@ RawDevice::~RawDevice ()
 
 int RawDevice::writeReport (const std::vector<uint8_t> &report)
 {
-	int ret = write (_p->fd, report.data (), report.size ());
+	int ret = static_cast<int> (write (_p->fd, report.data (), report.size ()));
 	if (ret == -1) {
 		throw std::system_error (errno, std::system_category (), "write");
 	}
@@ -149,7 +149,7 @@ int RawDevice::writeReport (const std::vector<uint8_t> &report)
 int RawDevice::readReport (std::vector<uint8_t> &report, int timeout)
 {
 	int ret;
-	timeval to = { timeout/1000, (timeout%1000) * 1000 };
+	timeval to = { timeout/1000, static_cast<long> ((timeout%1000) * 1000) };
 	fd_set fds;
 	do {
 		FD_ZERO (&fds);
@@ -162,7 +162,7 @@ int RawDevice::readReport (std::vector<uint8_t> &report, int timeout)
 	if (ret == -1)
 		throw std::system_error (errno, std::system_category (), "select");
 	if (FD_ISSET (_p->fd, &fds)) {
-		ret = read (_p->fd, report.data (), report.size ());
+		ret = static_cast<int> (read (_p->fd, report.data (), report.size ()));
 		if (ret == -1)
 			throw std::system_error (errno, std::system_category (), "read");
 		report.resize (ret);
@@ -171,7 +171,7 @@ int RawDevice::readReport (std::vector<uint8_t> &report, int timeout)
 	}
 	if (FD_ISSET (_p->pipe[0], &fds)) {
 		char c;
-		ret = read (_p->pipe[0], &c, sizeof (char));
+		ret = static_cast<int> (read (_p->pipe[0], &c, sizeof (char)));
 		if (ret == -1)
 			throw std::system_error (errno, std::system_category (), "read pipe");
 	}

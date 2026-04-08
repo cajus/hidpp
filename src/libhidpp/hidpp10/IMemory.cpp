@@ -42,8 +42,8 @@ int IMemory::readSome (Address address, uint8_t *buffer, std::size_t maxlen)
 	std::vector<uint8_t> results (LongParamLength);
 	_dev->getRegister (MemoryRead, &params, results);
 	std::size_t len = std::min (LongParamLength, maxlen);
-	std::copy (results.begin (), results.begin () + len, buffer);
-	return len;
+	std::copy (results.begin (), results.begin () + static_cast<std::ptrdiff_t> (len), buffer);
+	return static_cast<int> (len);
 }
 
 void IMemory::readMem (Address address, std::vector<uint8_t> &data)
@@ -99,10 +99,10 @@ void IMemory::writeMem (Address address, const std::vector<uint8_t> &data)
 			first = false;
 		}
 		else {
-			auto it = data.begin () + sent;
+			auto it = data.begin () + static_cast<std::ptrdiff_t> (sent);
 			std::size_t len = std::min (LongParamLength, data.size () - sent);
 			_dev->sendDataPacket (SendDataContinueAck, seq_num,
-					      it, it + len,
+					      it, it + static_cast<std::ptrdiff_t> (len),
 					      true);
 			sent += len;
 		}

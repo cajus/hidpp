@@ -335,13 +335,13 @@ Address Macro::write (const AbstractMacroFormat &format, AbstractMemoryMapping &
 				// fit before the end of page.
 				debug << "Check end of page jump at " << std::distance (instr_location, page_end) << " bytes from the end" << std::endl;
 				bool need_jump = false;
-				instr_location += item_len;
+				instr_location += static_cast<std::ptrdiff_t> (item_len);
 				for (auto it2 = std::next(it); it2 != _items.end (); ++it2) {
 					while (!mem.computeOffset (instr_location, item_addr) && jump_dests.count (&*it2) > 0) {
 						// Padding will be needed
 						++instr_location;
 					}
-					instr_location += format.getLength (*it2);
+					instr_location += static_cast<std::ptrdiff_t> (format.getLength (*it2));
 					if ((int) CRCLength > std::distance (instr_location, page_end)) {
 						// index reached end of page
 						need_jump = true;
@@ -381,7 +381,7 @@ Address Macro::write (const AbstractMacroFormat &format, AbstractMemoryMapping &
 		// Write the item itself
 		std::vector<uint8_t>::iterator jump_addr_it;
 		current = format.writeItem (current, item, jump_addr_it);
-		debug.printBytes (Item::InstructionStrings.at (item.instruction ()), current-item_len, current);
+		debug.printBytes (Item::InstructionStrings.at (item.instruction ()), current-static_cast<std::ptrdiff_t> (item_len), current);
 
 		// Remember jump address position for later resolution
 		if (item.isJump ()) {
