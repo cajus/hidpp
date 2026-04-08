@@ -19,6 +19,16 @@
 #ifndef LIBHIDPP_LOG_H
 #define LIBHIDPP_LOG_H
 
+#ifdef _WIN32
+#  ifdef hidpp_EXPORTS
+#    define HIDPP_EXPORT __declspec(dllexport)
+#  else
+#    define HIDPP_EXPORT __declspec(dllimport)
+#  endif
+#else
+#  define HIDPP_EXPORT
+#endif
+
 #include <format>
 #include <map>
 #include <mutex>
@@ -66,7 +76,7 @@ public:
 		std::map<std::string, bool> _sub_categories;
 		std::string _tag;
 	};
-	static Category Error, Warning, Info, Debug;
+	static HIDPP_EXPORT Category Error, Warning, Info, Debug;
 
 	/**
 	 * Initialize categories and subcategories states from parameter string

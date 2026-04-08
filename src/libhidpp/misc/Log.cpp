@@ -76,7 +76,7 @@ Log::Log (const std::string &prefix):
 }
 
 Log::Log (Log &&log):
-	std::ostream (std::move (log)),
+	std::ostream (std::move (static_cast<std::ostream &> (log))),
 	_buf (std::move (log._buf))
 {
 }
