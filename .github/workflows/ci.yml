@@ -84,6 +84,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Cache vcpkg packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.VCPKG_INSTALLATION_ROOT }}\installed
+          key: vcpkg-x64-windows-tinyxml2-pybind11-getopt-${{ hashFiles('C:/vcpkg/versions/baseline.json') }}
+          restore-keys: vcpkg-x64-windows-tinyxml2-pybind11-getopt-
+
       - name: Install vcpkg dependencies
         run: vcpkg install tinyxml2 pybind11 getopt
         env:

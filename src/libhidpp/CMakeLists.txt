@@ -86,9 +86,7 @@ elseif(ENABLE_SANITIZERS)
     )
 endif()
 
-set_target_properties(hidpp PROPERTIES
-	VERSION 0.2
-	WINDOWS_EXPORT_ALL_SYMBOLS ON)
+set_target_properties(hidpp PROPERTIES VERSION 0.2)
 target_include_directories(hidpp PUBLIC
 	$<INSTALL_INTERFACE:include/hidpp>
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
