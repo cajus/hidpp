@@ -101,6 +101,7 @@ jobs:
           cmake -B build `
             -G "Visual Studio 17 2022" -A x64 `
             -DHID_BACKEND=windows `
+            -DBUILD_SHARED_LIBS=OFF `
             -DBUILD_TOOLS=ON `
             -DBUILD_TESTS=ON `
             -DBUILD_PYTHON_BINDINGS=ON `
