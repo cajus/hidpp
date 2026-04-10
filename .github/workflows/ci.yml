@@ -108,6 +108,7 @@ jobs:
             -DBUILD_TESTS=ON `
             -DBUILD_PYTHON_BINDINGS=ON `
             -DVCPKG_TARGET_TRIPLET=x64-windows-static `
+            -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded `
             -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
 
       - name: Build
@@ -115,3 +116,33 @@ jobs:
 
       #- name: Test
       #  run: ctest --test-dir build -C Release --output-on-failure
+
+  macos:
+    if: false
+    name: macOS
+    runs-on: macos-26
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          brew install \
+            ninja \
+            tinyxml2 \
+            pybind11
+
+      - name: Configure
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DHID_BACKEND=hidapi \
+            -DBUILD_TOOLS=ON \
+            -DBUILD_TESTS=ON \
+            -DBUILD_PYTHON_BINDINGS=ON
+
+      - name: Build
+        run: cmake --build build
+
+      #- name: Test
+      #  run: ctest --test-dir build --output-on-failure
